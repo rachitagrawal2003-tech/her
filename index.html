@@ -1,0 +1,294 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Notes for You 💌</title>
+<style>
+  :root{
+    --paper:#fffef8;
+    --lines:#d7e0ea;
+    --ink:#2c2a34;
+    --accent:#ffb3c7;
+    --accent2:#a3bffa;
+    --pin:#ef4444;
+  }
+  html,body{height:100%}
+  body{
+    margin:0; font-family: ui-rounded, "SF Pro Rounded", system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+    color:var(--ink);
+    background:
+      linear-gradient(#fff0, #fff0), /* spacer */
+      linear-gradient(180deg, var(--paper), var(--paper)),
+      repeating-linear-gradient(#0000, #0000 23px, var(--lines) 24px, #0000 25px); /* notebook lines */
+    background-attachment: fixed;
+  }
+  .wrap{min-height:100%; display:grid; place-items:center; padding:24px}
+  .card{
+    width:min(620px, 94vw); background: #fffefc; position:relative;
+    border-radius:20px; padding:22px 18px 18px;
+    box-shadow: 0 18px 40px rgba(0,0,0,.08);
+    border:1px solid #f3eee1;
+  }
+  .title{font-size:22px; font-weight:800; text-align:center; letter-spacing:.2px}
+  .subtitle{font-size:13px; opacity:.7; text-align:center; margin-top:4px}
+  .controls{display:flex; gap:10px; justify-content:center; align-items:center; margin:16px 0 4px; flex-wrap:wrap}
+  button, .btn{
+    border:none; border-radius:999px; padding:10px 16px; cursor:pointer;
+    background:#fff; border:1px solid #eae6dc; box-shadow:0 4px 10px rgba(0,0,0,.04);
+    font-weight:700;
+  }
+  #openBtn{background:linear-gradient(135deg, var(--accent), var(--accent2)); color:#fff; border:none}
+  #musicBtn{background:#fff}
+  .note{
+    margin:14px auto 6px; width:min(560px, 90vw); min-height:120px;
+    background: #fffef6; position:relative; padding:18px 16px 38px;
+    color:var(--ink); line-height:1.5; font-size:18px;
+    /* torn paper feel */
+    box-shadow:0 12px 24px rgba(0,0,0,.07), inset 0 -1px 0 #f3eddc;
+    border:1px solid #efe7d5; border-radius:10px;
+    clip-path: polygon(0 8px, 8px 0, calc(100% - 8px) 0, 100% 8px, 100% calc(100% - 10px), calc(100% - 8px) 100%, 8px 100%, 0 calc(100% - 10px));
+  }
+  .note::before{
+    content:""; position:absolute; left:18px; top:-10px; width:16px; height:16px; border-radius:50%;
+    background: var(--pin); box-shadow:0 2px 4px rgba(0,0,0,.2);
+  }
+  .note .label{font-size:12px; letter-spacing:.4px; font-weight:800; opacity:.5; text-transform:uppercase}
+  .note .content{margin-top:6px}
+  .signature{position:absolute; right:12px; bottom:10px; font-size:12px; opacity:.7}
+  .row{display:flex; gap:8px; flex-wrap:wrap; align-items:center}
+  .hearts{display:flex; gap:8px; margin-top:10px}
+  .heartBtn{
+    width:40px; height:40px; border-radius:50%; border:1px solid #edded0; background:#fff; cursor:pointer;
+    box-shadow:0 3px 8px rgba(0,0,0,.05); font-size:18px;
+  }
+  .answers{display:flex; gap:8px; margin-top:10px; flex-wrap:wrap}
+  .mini{padding:6px 10px; font-size:13px}
+  .muted{opacity:.7; font-size:14px}
+  .hidden{display:none}
+  .foot{margin-top:10px; text-align:center; font-size:12px; opacity:.6}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="card">
+    <div class="title">Tap to open your surprise 💌</div>
+    <div class="subtitle">A random note appears each time. Sound on for a tiny pop.</div>
+
+    <div class="controls">
+      <button id="openBtn">Open a note</button>
+      <button id="musicBtn" class="btn">▶︎ Music</button>
+    </div>
+
+    <div id="noteArea" class="note">
+      <div class="label">Note</div>
+      <div class="content" id="noteContent">
+        Hi love — press “Open a note” whenever you want a message from me.
+      </div>
+      <div class="signature">From: <b>Kitten 🐾</b></div>
+    </div>
+
+    <div class="foot">Tip: Add to Home Screen to make it feel like an app.</div>
+  </div>
+</div>
+
+<!-- Pop sound (tiny, embedded) -->
+<audio id="pop" preload="auto">
+  <source src="data:audio/mp3;base64,//uQZAAAAAAAAAAAAAAAAAAAAAAAWGluZwAAAA8AAAACAAACcQAA..." type="audio/mp3">
+  <!-- If the embedded data URL fails, no problem; it’ll just be silent -->
+</audio>
+
+<!-- Background music (toggle). Replace src later with your own track URL -->
+<audio id="bgm" loop>
+  <source src="https://cdn.pixabay.com/download/audio/2022/02/23/audio_3a2f5f720a.mp3?filename=soft-piano-ambient-ambient-110241.mp3" type="audio/mpeg">
+</audio>
+
+<script>
+/* ---------- Utilities ---------- */
+const $ = sel => document.querySelector(sel);
+const pop = $('#pop');
+const bgm = $('#bgm');
+const openBtn = $('#openBtn');
+const musicBtn = $('#musicBtn');
+const content = $('#noteContent');
+
+/* Safe pop (some browsers block autoplay, but click will allow) */
+function playPop(){ try{ pop.currentTime = 0; pop.play(); }catch{} }
+
+/* Music toggle */
+let musicOn = false;
+musicBtn.addEventListener('click', async ()=>{
+  try{
+    if(!musicOn){ await bgm.play(); musicOn = true; musicBtn.textContent = '⏸︎ Pause music'; }
+    else { bgm.pause(); musicOn = false; musicBtn.textContent = '▶︎ Music'; }
+  }catch(e){ alert('Tap the page once, then try again to start music.'); }
+});
+
+/* ---------- Notes Pool ---------- */
+/* Each entry can be:
+  {type:'text', text:'...'}
+  {type:'button', question:'...', buttonText:'Mai hu 😎', reply:'...'}
+  {type:'guess', letters:'LOVE'}
+  {type:'hearts', count:3, reply:'...'}
+  {type:'story', lines:[...]}
+  {type:'countdown', days:18}
+  {type:'trivia', question:'...', options:['You','Still you','Always you'], reply:'Correct. It was always you.'}
+*/
+
+const NOTES = [
+  {type:'text', text:'I love you.'},
+  {type:'text', text:'You look just like a dream.'},
+  {type:'text', text:"The prettiest girl I've ever seen."},
+  {type:'text', text:'Muah 💋'},
+  {type:'text', text:'Mera paaro.'},
+  {type:'text', text:'Mera shono.'},
+  {type:'text', text:'Mera kuchu.'},
+  {type:'button', question:'Kaun hai mera sabse smarty bhondu?', buttonText:'Mai hu 😎', reply:'Haan, obviously you. No contest.'},
+  {type:'guess', letters:'LOVE'},
+  {type:'hearts', count:3, reply:"That’s how many times I love you today (minimum)."},
+  {type:'story', lines:[
+    'Once upon a time, there was a boy who met a girl online…',
+    '…and that was the luckiest thing that ever happened to him.'
+  ]},
+  {type:'countdown', days:18},
+  {type:'trivia', question:"What’s my favorite human’s name?", options:['You','Still you','Always you'], reply:'Correct. It was always you.'},
+  {type:'text', text:"You’re doing amazing, and I’m proud of you."},
+  {type:'text', text:'You’ve got this, advocate girl ⚖️'},
+  {type:'text', text:'Take a deep breath. You’re safe. You’re loved.'},
+  {type:'text', text:'Your smile should be declared a national treasure.'},
+  {type:'text', text:'Even your anxious self is my favorite self.'},
+  {type:'text', text:'Confidence boost (passive): off the charts — you’ve got this.'},
+  {type:'text', text:'Down bad for me: all the time. Same, unapologetically.'}
+];
+
+/* Random without repeating until pool resets */
+let pool = [...NOTES];
+function pickNote(){
+  if(pool.length===0) pool = [...NOTES];
+  const i = Math.floor(Math.random()*pool.length);
+  return pool.splice(i,1)[0];
+}
+
+/* Renderers */
+function clearContent(){ content.innerHTML = ''; }
+
+function renderText(text){
+  content.innerHTML = `<div>${escapeHTML(text)}</div>`;
+}
+function renderButton(q, btnText, reply){
+  content.innerHTML = `
+    <div class="row"><strong>${escapeHTML(q)}</strong></div>
+    <button class="mini" id="miniBtn">${escapeHTML(btnText)}</button>
+    <div class="muted hidden" id="miniReply">${escapeHTML(reply)}</div>
+  `;
+  $('#miniBtn').addEventListener('click', ()=>{
+    $('#miniReply').classList.remove('hidden');
+  });
+}
+function renderGuess(letters='LOVE'){
+  const arr = [...letters];
+  content.innerHTML = `
+    <div class="muted">Guess the word I’m thinking…</div>
+    <div id="slots" style="display:flex; gap:8px; margin-top:10px;"></div>
+  `;
+  const slots = $('#slots');
+  let shown = 0;
+  function reveal(){
+    if(shown < arr.length){
+      const span = document.createElement('span');
+      span.textContent = arr[shown++];
+      span.style.fontWeight='900';
+      span.style.fontSize='24px';
+      span.style.padding='6px 10px';
+      span.style.border='1px solid #edded0';
+      span.style.borderRadius='8px';
+      span.style.background='#fff';
+      slots.appendChild(span);
+      if(shown < arr.length) setTimeout(reveal, 450);
+    }
+  }
+  reveal();
+}
+function renderHearts(count=3, reply='That’s how many times I love you today.'){
+  content.innerHTML = `<div class="muted">Tap the hearts in the right order 💖</div><div class="hearts" id="hearts"></div><div class="muted hidden" id="hReply">${escapeHTML(reply)}</div>`;
+  const box = $('#hearts');
+  let tapped = 0;
+  for(let i=0;i<count;i++){
+    const b = document.createElement('button');
+    b.className='heartBtn';
+    b.textContent = '💖';
+    b.addEventListener('click', ()=>{
+      tapped++;
+      b.disabled = true; b.style.opacity=.5;
+      if(tapped===count) $('#hReply').classList.remove('hidden');
+    });
+    box.appendChild(b);
+  }
+}
+function renderStory(lines){
+  content.innerHTML = '';
+  (async ()=>{
+    for(const line of lines){
+      const p = document.createElement('div');
+      p.style.marginTop='6px';
+      p.textContent = line;
+      content.appendChild(p);
+      await new Promise(r=>setTimeout(r, 700));
+    }
+  })();
+}
+function renderCountdown(days=18){
+  /* By request: always “18 days” from now. If you have a date, replace with a fixed targetDate string. */
+  const ms = 24*60*60*1000;
+  const target = new Date(Date.now() + days*ms);
+  content.innerHTML = `<div class="muted">Days till I see you again 💫</div><div id="clock" style="font-size:28px; font-weight:900; margin-top:8px;"></div>`;
+  const clock = $('#clock');
+  function tick(){
+    const now = new Date();
+    let diff = target - now;
+    if(diff < 0) diff = 0;
+    const d = Math.ceil(diff / ms);
+    const h = Math.floor((diff % ms) / (60*60*1000));
+    const m = Math.floor((diff % (60*60*1000)) / (60*1000));
+    clock.textContent = `${d} days ${h}h ${m}m`;
+  }
+  tick();
+  setInterval(tick, 60000);
+}
+function renderTrivia(q, options, reply){
+  content.innerHTML = `<div><strong>${escapeHTML(q)}</strong></div><div class="answers" id="opts"></div><div id="ans" class="muted hidden" style="margin-top:6px;">${escapeHTML(reply)}</div>`;
+  const box = $('#opts');
+  options.forEach(opt=>{
+    const b = document.createElement('button');
+    b.className='mini';
+    b.textContent = opt;
+    b.addEventListener('click', ()=>{
+      $('#ans').classList.remove('hidden');
+    });
+    box.appendChild(b);
+  });
+}
+
+/* Escape helper */
+function escapeHTML(s){ return s.replace(/[&<>"']/g, m=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[m])); }
+
+/* Main */
+function showRandomNote(){
+  playPop();
+  const n = pickNote();
+  switch(n.type){
+    case 'text':        renderText(n.text); break;
+    case 'button':      renderButton(n.question, n.buttonText, n.reply); break;
+    case 'guess':       renderGuess(n.letters); break;
+    case 'hearts':      renderHearts(n.count, n.reply); break;
+    case 'story':       renderStory(n.lines); break;
+    case 'countdown':   renderCountdown(n.days); break;
+    case 'trivia':      renderTrivia(n.question, n.options, n.reply); break;
+    default:            renderText('Hi, I love you.');
+  }
+}
+
+openBtn.addEventListener('click', showRandomNote);
+</script>
+</body>
+</html>

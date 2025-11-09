@@ -4,76 +4,155 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
 <title>Notes for You 💌</title>
+
+<!-- Handwritten + clean fonts -->
+<link href="https://fonts.googleapis.com/css2?family=Handlee&family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+
 <style>
   :root{
-    --paper:#fffef8;
-    --lines:#d7e0ea;
+    --bg1:#fff7fb;         /* cozy gradient */
+    --bg2:#f4f7ff;
+    --paper:#fffdf7;       /* card/note paper */
+    --texture: url('https://www.transparenttextures.com/patterns/paper-1.png');
     --ink:#2c2a34;
-    --accent:#ffb3c7;
-    --accent2:#a3bffa;
+    --accent:#f7bdd1;      /* soft pink */
+    --accent2:#b9c8ff;     /* soft lavender */
     --pin:#ef4444;
+    --line:#e6ecf3;
   }
+
   html,body{height:100%}
   body{
-    margin:0; font-family: ui-rounded, "SF Pro Rounded", system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+    margin:0;
+    font-family: 'Inter', system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
     color:var(--ink);
-    background:
-      linear-gradient(#fff0, #fff0), /* spacer */
-      linear-gradient(180deg, var(--paper), var(--paper)),
-      repeating-linear-gradient(#0000, #0000 23px, var(--lines) 24px, #0000 25px); /* notebook lines */
+    background: linear-gradient(135deg,var(--bg1),var(--bg2));
     background-attachment: fixed;
   }
-  .wrap{min-height:100%; display:grid; place-items:center; padding:24px}
+
+  /* grid center, mobile-first */
+  .wrap{
+    min-height:100%;
+    display:grid;
+    place-items:center;
+    padding:20px 14px;
+  }
+
+  /* notebook lines behind the card (subtle) */
+  .wrap::before{
+    content:"";
+    position:fixed; inset:0;
+    background:
+      repeating-linear-gradient(#0000,#0000 28px, var(--line) 29px, #0000 30px);
+    opacity:.35; pointer-events:none;
+  }
+
   .card{
-    width:min(620px, 94vw); background: #fffefc; position:relative;
-    border-radius:20px; padding:22px 18px 18px;
-    box-shadow: 0 18px 40px rgba(0,0,0,.08);
-    border:1px solid #f3eee1;
+    width:min(420px, 94vw);
+    background: var(--paper);
+    background-image: var(--texture);
+    border-radius:22px;
+    padding:18px 14px 16px;
+    border:1px solid #f1e9db;
+    box-shadow: 0 14px 38px rgba(0,0,0,.10);
+    position:relative;
   }
-  .title{font-size:22px; font-weight:800; text-align:center; letter-spacing:.2px}
-  .subtitle{font-size:13px; opacity:.7; text-align:center; margin-top:4px}
-  .controls{display:flex; gap:10px; justify-content:center; align-items:center; margin:16px 0 4px; flex-wrap:wrap}
+
+  .title{
+    font-family:'Handlee', cursive;
+    text-align:center;
+    font-size:24px;
+    font-weight:800;
+    letter-spacing:.2px;
+  }
+  .subtitle{
+    text-align:center;
+    font-size:13px;
+    opacity:.7;
+    margin-top:2px;
+  }
+
+  .controls{
+    display:flex; gap:10px; justify-content:center; align-items:center;
+    margin:14px 0 8px; flex-wrap:wrap;
+  }
+
   button, .btn{
-    border:none; border-radius:999px; padding:10px 16px; cursor:pointer;
-    background:#fff; border:1px solid #eae6dc; box-shadow:0 4px 10px rgba(0,0,0,.04);
-    font-weight:700;
+    border:none; border-radius:999px;
+    padding:12px 16px; cursor:pointer;
+    background:#fff; border:1px solid #ece5d7;
+    box-shadow:0 4px 10px rgba(0,0,0,.05);
+    font-weight:800; font-size:14px;
+    transition:transform .08s ease, box-shadow .15s ease;
   }
-  #openBtn{background:linear-gradient(135deg, var(--accent), var(--accent2)); color:#fff; border:none}
-  #musicBtn{background:#fff}
+  button:active{ transform:scale(.98) }
+  #openBtn{
+    background:linear-gradient(135deg, var(--accent), var(--accent2));
+    color:#fff; border:none;
+  }
+  #musicBtn{ background:#fff }
+
   .note{
-    margin:14px auto 6px; width:min(560px, 90vw); min-height:120px;
-    background: #fffef6; position:relative; padding:18px 16px 38px;
-    color:var(--ink); line-height:1.5; font-size:18px;
-    /* torn paper feel */
-    box-shadow:0 12px 24px rgba(0,0,0,.07), inset 0 -1px 0 #f3eddc;
-    border:1px solid #efe7d5; border-radius:10px;
-    clip-path: polygon(0 8px, 8px 0, calc(100% - 8px) 0, 100% 8px, 100% calc(100% - 10px), calc(100% - 8px) 100%, 8px 100%, 0 calc(100% - 10px));
+    margin:12px auto 6px;
+    width:min(392px, 90vw);
+    min-height:132px;
+    background: #fffdf7;
+    background-image: var(--texture);
+    position:relative;
+    padding:18px 16px 38px;
+    color:var(--ink); line-height:1.55; font-size:18px;
+    border:1px solid #efe7d5; border-radius:12px;
+    /* torn edges */
+    clip-path: polygon(0 10px, 10px 0, calc(100% - 10px) 0, 100% 10px, 100% calc(100% - 12px), calc(100% - 10px) 100%, 10px 100%, 0 calc(100% - 12px));
+    /* pastel shadow */
+    box-shadow:0 12px 24px rgba(249,170,196,0.18), 0 6px 10px rgba(185,200,255,0.18), inset 0 -1px 0 #f3eddc;
+    /* appear animation container target */
+    opacity:1; transform:translateY(0);
+    transition: opacity .4s ease, transform .4s ease;
   }
+
+  /* red pin */
   .note::before{
-    content:""; position:absolute; left:18px; top:-10px; width:16px; height:16px; border-radius:50%;
+    content:""; position:absolute; left:18px; top:-10px;
+    width:16px; height:16px; border-radius:50%;
     background: var(--pin); box-shadow:0 2px 4px rgba(0,0,0,.2);
   }
-  .note .label{font-size:12px; letter-spacing:.4px; font-weight:800; opacity:.5; text-transform:uppercase}
-  .note .content{margin-top:6px}
-  .signature{position:absolute; right:12px; bottom:10px; font-size:12px; opacity:.7}
+
+  .note .label{
+    font-size:12px; letter-spacing:.4px; font-weight:800; opacity:.5; text-transform:uppercase;
+  }
+  .note .content{ margin-top:8px }
+  .signature{
+    position:absolute; right:12px; bottom:10px;
+    font-size:12px; opacity:.75; font-weight:600;
+    font-family:'Handlee', cursive;
+  }
+
   .row{display:flex; gap:8px; flex-wrap:wrap; align-items:center}
   .hearts{display:flex; gap:8px; margin-top:10px}
   .heartBtn{
-    width:40px; height:40px; border-radius:50%; border:1px solid #edded0; background:#fff; cursor:pointer;
-    box-shadow:0 3px 8px rgba(0,0,0,.05); font-size:18px;
+    width:44px; height:44px; border-radius:50%;
+    border:1px solid #edded0; background:#fff; cursor:pointer;
+    box-shadow:0 3px 8px rgba(0,0,0,.06); font-size:20px;
   }
   .answers{display:flex; gap:8px; margin-top:10px; flex-wrap:wrap}
-  .mini{padding:6px 10px; font-size:13px}
-  .muted{opacity:.7; font-size:14px}
+  .mini{padding:8px 12px; font-size:14px; font-weight:700; border-radius:999px; border:1px solid #e9e1d2; background:#fff}
+  .muted{opacity:.75; font-size:14px}
   .hidden{display:none}
   .foot{margin-top:10px; text-align:center; font-size:12px; opacity:.6}
+
+  /* make it a bit wider on desktop */
+  @media (min-width: 900px){
+    .card{ width:520px }
+    .note{ width:480px }
+  }
 </style>
 </head>
 <body>
 <div class="wrap">
   <div class="card">
     <div class="title">Tap to open your surprise 💌</div>
-    <div class="subtitle">A random note appears each time. Sound on for a tiny pop.</div>
+    <div class="subtitle">Random torn-paper notes. Sound on for a tiny pop.</div>
 
     <div class="controls">
       <button id="openBtn">Open a note</button>
@@ -92,10 +171,9 @@
   </div>
 </div>
 
-<!-- Pop sound (tiny, embedded) -->
+<!-- Pop sound (kept tiny; will silently fail if blocked) -->
 <audio id="pop" preload="auto">
   <source src="data:audio/mp3;base64,//uQZAAAAAAAAAAAAAAAAAAAAAAAWGluZwAAAA8AAAACAAACcQAA..." type="audio/mp3">
-  <!-- If the embedded data URL fails, no problem; it’ll just be silent -->
 </audio>
 
 <!-- Background music (toggle). Replace src later with your own track URL -->
@@ -110,9 +188,22 @@ const pop = $('#pop');
 const bgm = $('#bgm');
 const openBtn = $('#openBtn');
 const musicBtn = $('#musicBtn');
+const note = $('#noteArea');
 const content = $('#noteContent');
 
-/* Safe pop (some browsers block autoplay, but click will allow) */
+/* Tiny appear animation each reveal */
+function animateNote(){
+  note.style.opacity = 0;
+  note.style.transform = 'translateY(10px)';
+  requestAnimationFrame(()=> {
+    setTimeout(()=>{
+      note.style.opacity = 1;
+      note.style.transform = 'translateY(0)';
+    }, 80);
+  });
+}
+
+/* Safe pop (user gesture unlocks) */
 function playPop(){ try{ pop.currentTime = 0; pop.play(); }catch{} }
 
 /* Music toggle */
@@ -125,16 +216,6 @@ musicBtn.addEventListener('click', async ()=>{
 });
 
 /* ---------- Notes Pool ---------- */
-/* Each entry can be:
-  {type:'text', text:'...'}
-  {type:'button', question:'...', buttonText:'Mai hu 😎', reply:'...'}
-  {type:'guess', letters:'LOVE'}
-  {type:'hearts', count:3, reply:'...'}
-  {type:'story', lines:[...]}
-  {type:'countdown', days:18}
-  {type:'trivia', question:'...', options:['You','Still you','Always you'], reply:'Correct. It was always you.'}
-*/
-
 const NOTES = [
   {type:'text', text:'I love you.'},
   {type:'text', text:'You look just like a dream.'},
@@ -150,7 +231,7 @@ const NOTES = [
     'Once upon a time, there was a boy who met a girl online…',
     '…and that was the luckiest thing that ever happened to him.'
   ]},
-  {type:'countdown', days:18},
+  {type:'countdown', days:18}, // default relative countdown
   {type:'trivia', question:"What’s my favorite human’s name?", options:['You','Still you','Always you'], reply:'Correct. It was always you.'},
   {type:'text', text:"You’re doing amazing, and I’m proud of you."},
   {type:'text', text:'You’ve got this, advocate girl ⚖️'},
@@ -170,8 +251,6 @@ function pickNote(){
 }
 
 /* Renderers */
-function clearContent(){ content.innerHTML = ''; }
-
 function renderText(text){
   content.innerHTML = `<div>${escapeHTML(text)}</div>`;
 }
@@ -181,9 +260,7 @@ function renderButton(q, btnText, reply){
     <button class="mini" id="miniBtn">${escapeHTML(btnText)}</button>
     <div class="muted hidden" id="miniReply">${escapeHTML(reply)}</div>
   `;
-  $('#miniBtn').addEventListener('click', ()=>{
-    $('#miniReply').classList.remove('hidden');
-  });
+  $('#miniBtn').addEventListener('click', ()=> $('#miniReply').classList.remove('hidden'));
 }
 function renderGuess(letters='LOVE'){
   const arr = [...letters];
@@ -193,7 +270,7 @@ function renderGuess(letters='LOVE'){
   `;
   const slots = $('#slots');
   let shown = 0;
-  function reveal(){
+  (function reveal(){
     if(shown < arr.length){
       const span = document.createElement('span');
       span.textContent = arr[shown++];
@@ -204,10 +281,9 @@ function renderGuess(letters='LOVE'){
       span.style.borderRadius='8px';
       span.style.background='#fff';
       slots.appendChild(span);
-      if(shown < arr.length) setTimeout(reveal, 450);
+      setTimeout(reveal, 450);
     }
-  }
-  reveal();
+  })();
 }
 function renderHearts(count=3, reply='That’s how many times I love you today.'){
   content.innerHTML = `<div class="muted">Tap the hearts in the right order 💖</div><div class="hearts" id="hearts"></div><div class="muted hidden" id="hReply">${escapeHTML(reply)}</div>`;
@@ -225,6 +301,50 @@ function renderHearts(count=3, reply='That’s how many times I love you today.'
     box.appendChild(b);
   }
 }
+
+/* -------- Countdown FIX -------- */
+function renderCountdown(daysFromNow=18){
+  const msDay = 24*60*60*1000, msHour = 60*60*1000, msMin = 60*1000, msSec = 1000;
+
+  /* Option A: relative 18 days from now (default) */
+  let target = new Date(Date.now() + daysFromNow*msDay);
+
+  /* Option B: FIXED DATE (uncomment next line and set your date) */
+  // target = new Date('2025-12-31T18:00:00'); // <— set exact meeting date/time
+
+  /* Option C: persist a one-time target in localStorage (so it doesn’t reset on refresh)
+     Uncomment the block below to enable
+  */
+  /*
+  const KEY='kitten_countdown_target';
+  const saved = localStorage.getItem(KEY);
+  if(saved){ target = new Date(saved); }
+  else { localStorage.setItem(KEY, target.toISOString()); }
+  */
+
+  content.innerHTML = `<div class="muted">Days till I see you again 💫</div><div id="clock" style="font-size:26px; font-weight:900; margin-top:8px;"></div>`;
+  const clock = $('#clock');
+
+  function tick(){
+    let diff = target - new Date();
+    if(diff < 0) diff = 0;
+
+    const d = Math.floor(diff / msDay);
+    diff -= d*msDay;
+    const h = Math.floor(diff / msHour);
+    diff -= h*msHour;
+    const m = Math.floor(diff / msMin);
+    diff -= m*msMin;
+    const s = Math.floor(diff / msSec);
+
+    clock.textContent = `${d} days ${h}h ${m}m ${s}s`;
+  }
+  tick();
+  clearInterval(window.__countdownTimer);
+  window.__countdownTimer = setInterval(tick, 1000);
+}
+/* -------------------------------- */
+
 function renderStory(lines){
   content.innerHTML = '';
   (async ()=>{
@@ -233,27 +353,9 @@ function renderStory(lines){
       p.style.marginTop='6px';
       p.textContent = line;
       content.appendChild(p);
-      await new Promise(r=>setTimeout(r, 700));
+      await new Promise(r=>setTimeout(r, 650));
     }
   })();
-}
-function renderCountdown(days=18){
-  /* By request: always “18 days” from now. If you have a date, replace with a fixed targetDate string. */
-  const ms = 24*60*60*1000;
-  const target = new Date(Date.now() + days*ms);
-  content.innerHTML = `<div class="muted">Days till I see you again 💫</div><div id="clock" style="font-size:28px; font-weight:900; margin-top:8px;"></div>`;
-  const clock = $('#clock');
-  function tick(){
-    const now = new Date();
-    let diff = target - now;
-    if(diff < 0) diff = 0;
-    const d = Math.ceil(diff / ms);
-    const h = Math.floor((diff % ms) / (60*60*1000));
-    const m = Math.floor((diff % (60*60*1000)) / (60*1000));
-    clock.textContent = `${d} days ${h}h ${m}m`;
-  }
-  tick();
-  setInterval(tick, 60000);
 }
 function renderTrivia(q, options, reply){
   content.innerHTML = `<div><strong>${escapeHTML(q)}</strong></div><div class="answers" id="opts"></div><div id="ans" class="muted hidden" style="margin-top:6px;">${escapeHTML(reply)}</div>`;
@@ -262,9 +364,7 @@ function renderTrivia(q, options, reply){
     const b = document.createElement('button');
     b.className='mini';
     b.textContent = opt;
-    b.addEventListener('click', ()=>{
-      $('#ans').classList.remove('hidden');
-    });
+    b.addEventListener('click', ()=> $('#ans').classList.remove('hidden'));
     box.appendChild(b);
   });
 }
@@ -276,6 +376,7 @@ function escapeHTML(s){ return s.replace(/[&<>"']/g, m=>({ '&':'&amp;','<':'&lt;
 function showRandomNote(){
   playPop();
   const n = pickNote();
+  animateNote();
   switch(n.type){
     case 'text':        renderText(n.text); break;
     case 'button':      renderButton(n.question, n.buttonText, n.reply); break;
